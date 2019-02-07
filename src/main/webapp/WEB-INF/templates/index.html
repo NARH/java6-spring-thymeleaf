@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Java6 と Spring + Thymeleaf のサンプル</title>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+<style type="text/css">
+.bs-component+.bs-component {
+	margin-top: 1rem;
+}
+
+@media ( min-width : 768px) {
+	.bs-docs-section {
+		margin-top: 8em;
+	}
+	.bs-component {
+		position: relative;
+	}
+	.bs-component .modal {
+		position: relative;
+		top: auto;
+		right: auto;
+		bottom: auto;
+		left: auto;
+		z-index: 1;
+		display: block;
+	}
+	.bs-component .modal-dialog {
+		width: 90%;
+	}
+	.bs-component .popover {
+		position: relative;
+		display: inline-block;
+		width: 220px;
+		margin: 20px;
+	}
+	.nav-tabs {
+		margin-bottom: 15px;
+	}
+	.progress {
+		margin-bottom: 10px;
+	}
+}
+</style>
+
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row"></div>
+	</div>
+	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+		integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+		crossorigin="anonymous"></script>
+	<script src="./js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+    $('.bs-component [data-toggle="popover"]').popover();
+    $('.bs-component [data-toggle="tooltip"]').tooltip();
+    </script>
+
+</body>
+</html>
