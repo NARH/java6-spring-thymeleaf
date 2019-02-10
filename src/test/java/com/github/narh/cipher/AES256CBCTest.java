@@ -44,7 +44,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.narh.cipher.command.AES256CryptCommand;
+import com.github.narh.cipher.command.AES256CBCCryptCommand;
 import com.github.narh.cipher.command.CryptCommand;
 
 /**
@@ -151,7 +151,7 @@ public class AES256CBCTest {
         .origin(origin)
         .build();
 
-    CryptCommand command = new AES256CryptCommand();
+    CryptCommand command = new AES256CBCCryptCommand();
 //    CryptCommand command = new AES128CryptCommand();
     command.encrypt(context);
 

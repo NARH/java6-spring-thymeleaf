@@ -53,6 +53,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractAESCryptCommand implements CryptCommand {
 
+  public static final String PAYLOAD_STRING = "Salted__";
+
   /* (非 Javadoc)
    * @see com.github.narh.cipher.command.CryptCommand#encrypt(com.github.narh.cipher.CipherContext)
    */
@@ -86,12 +88,12 @@ public abstract class AbstractAESCryptCommand implements CryptCommand {
 
       byte[] origin;
       if(null != context.getCryptMode() && Cipher.DECRYPT_MODE == context.getCryptMode().mode) {
-        int offset = 8 + context.getSalt().length;
+        int offset = PAYLOAD_STRING.getBytes().length + context.getSalt().length;
         origin = Arrays.copyOfRange(context.getOrigin(), offset, context.getOrigin().length);
         return (0 == origin.length) ? origin : cipher.doFinal(origin);
       }
       else {
-        byte[] payload = "Salted__".getBytes();
+        byte[] payload = PAYLOAD_STRING.getBytes();
         byte[] header = ArrayUtils.addAll(payload, context.getSalt());
         origin = ArrayUtils.addAll(header, cipher.doFinal(context.getOrigin()));
         return origin;

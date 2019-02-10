@@ -35,11 +35,15 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.github.narh.cipher.CipherContext;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 /**
  * @author narita
  *
  */
-public class AES128CryptCommand extends AbstractAESCryptCommand implements CryptCommand {
+@Data @EqualsAndHashCode(callSuper=false)
+public class AES128CBCCryptCommand extends AbstractAESCryptCommand implements CryptCommand {
 
   public static final String KEY_ENCODING   = "AES";
   public static final String ENCODING_MODE  = "AES/CBC/PKCS5PADDING";
