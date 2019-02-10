@@ -30,7 +30,9 @@ package com.github.narh.cipher;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -112,5 +114,22 @@ public class Utils {
     inputStream.close();
     return contents;
    }
+
+  public static List<File> getList(final File directory) {
+    if(!directory.isDirectory()) {
+      List<File> list = new ArrayList<File>();
+      list.add(directory);
+      return list;
+    }
+    return Arrays.asList(directory.listFiles());
+  }
+
+  public static List<File> fileHiddenFilter(final List<File> list) {
+    List<File> results = new ArrayList<File>();
+    for(File f : list) {
+      if(!f.isHidden()) results.add(f);
+    }
+    return results;
+  }
 }
 
