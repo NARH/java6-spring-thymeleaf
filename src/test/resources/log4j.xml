@@ -10,6 +10,7 @@
   </appender>
 
   <root>
+    <level value ="trace" />
     <appender-ref ref="stdout"/>
   </root>
 </log4j:configuration>
