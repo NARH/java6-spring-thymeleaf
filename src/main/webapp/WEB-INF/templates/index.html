@@ -89,6 +89,16 @@
   <script type="text/javascript">
   $('.bs-component [data-toggle="popover"]').popover();
   $('.bs-component [data-toggle="tooltip"]').tooltip();
+
+  var config = {
+      SERVER_BASE_DIR: "/home"
+    , CIPHER_ALGORITHM: "AES"
+    , CIPHER_MODE: "CBC"
+    , CIPHER_PADDING: "PKCS5Padding"
+  }
+  localStorage.setItem("config", JSON.stringify(config));
+  console.log(JSON.parse(localStorage.getItem("config")));
+  console.log(JSON.parse(localStorage.getItem("config")).SERVER_BASE_DIR);
   </script>
 </body>
 </html>
