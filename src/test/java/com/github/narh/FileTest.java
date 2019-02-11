@@ -27,8 +27,12 @@
 
 package com.github.narh;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -45,12 +49,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FileTest {
 
-  final String currentDir = "/Users/narita/Develop/workspace/java6-spring-thymeleaf.git/";
+  final String currentDir = new File(".").getAbsoluteFile().getParent().concat(File.separator);
 
   @Test
   public void testFileList() throws Exception {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     List<File> list = Utils.fileHiddenFilter(Utils.getList(new File(currentDir)));
+    assertThat("3件表示されること", list.size(), is(3));
+
+    List<String> fileNames = new ArrayList<String>();
+    for(File file : list) fileNames.add(file.getName());
+    assertThat("pom.xml が含まれること", fileNames, hasItem("pom.xml"));
+    assertThat("src が含まれること", fileNames, hasItem("src"));
+    assertThat("target が含まれること", fileNames, hasItem("target"));
+
     for(File file : list) {
       log.info(file.getCanonicalPath().substring(currentDir.length()));
       log.info("更新日時:{}", sdf.format(new Date(file.lastModified())));
