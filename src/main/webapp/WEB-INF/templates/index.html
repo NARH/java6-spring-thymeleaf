@@ -76,12 +76,57 @@
     </nav>
   </header>
   <div class="container-fluid">
-    <div class="row"></div>
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="bs-component">
+          <form>
+            <fieldset>
+              <legend>ファイル復号化</legend>
+              <div class="form-group row">
+                <label for="passphrase" class="col-sm-3 col-form-label">パスフレーズ</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control-plaintext" id="passphrase" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="salt" class="col-sm-3 col-form-label">SALT</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control-plaintext" id="salt" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="secretKey" class="col-sm-3 col-form-label">鍵データ</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control-plaintext" id="secretKey" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="iv" class="col-sm-3 col-form-label">IV</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control-plaintext" id="iv" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="iv" class="col-sm-3 col-form-label">サーバディレクトリ</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control-plaintext" id="directory" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="iv" class="col-sm-3 col-form-label">ファイル名</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control-plaintext" id="file" value="">
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary" id="file_decrypt_btn">復号化</button>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
     integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
     crossorigin="anonymous"></script>
@@ -89,6 +134,30 @@
   <script type="text/javascript">
   $('.bs-component [data-toggle="popover"]').popover();
   $('.bs-component [data-toggle="tooltip"]').tooltip();
+  $('#file_decrypt_btn').click(function(){
+    var data = {
+        cryptMode: 2
+      , passphrase: $('#passphrase').val()
+      , salt: $('#salt').val()
+      , secretKey: $('#secretKey').val()
+      , iv: $('#iv').val()
+      , origin: ''
+      , contents: ''
+      , directory: $('#directory').val()
+      , file: $('#file').val()
+    };
+
+    $.ajax({
+        type:"post"
+      , url:"./api/file_decrypt"
+      , data:JSON.stringify(data)
+      , contentType: 'application/json'
+      , dataType: "json"
+      , success: function(json_data) {
+        console.log(json_data);
+      }
+    });
+  });
 
   var config = {
       SERVER_BASE_DIR: "/home"

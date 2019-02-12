@@ -25,34 +25,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.github.narh.cipher;
+package com.github.narh;
 
-import javax.crypto.Cipher;
+import java.io.Serializable;
+
+import lombok.Data;
 
 /**
  * @author narita
  *
  */
-public enum CryptMode {
-    ENCRYPT(Cipher.ENCRYPT_MODE)      // 暗号化
-  , DECRYPT(Cipher.DECRYPT_MODE)      // 復号化
-  ;
-
-  /**
-   * 暗号化モード
-   * 0: 暗号化
-   * 1: 復号化
-   */
-  public final Integer mode;
-
-  /** コンストラクタ */
-  private CryptMode(final int mode) {
-    this.mode = mode;
-  }
-
-  public CryptMode of(final int mode) throws UnsupportedOperationException {
-    for(CryptMode m : values())
-      if(m.mode == mode) return m;
-    throw new UnsupportedOperationException("not supported operation (" + mode + ")");
-  }
+@Data
+public class WebApiModel implements Serializable {
+  /** モード */
+  private int cryptMode;
+  /** パスフレーズ */
+  private String passphrase;
+  /** salt */
+  private String salt;
+  /** 鍵データ */
+  private String secretKey;
+  /** 初期化ベクトル */
+  private String iv;
+  /** 対象データ */
+  private String origin;
+  /** 暗号化・復号化後データ */
+  private String contents;
+  /** サーバディレクトリ */
+  private String directory;
+  /** ファイル名 */
+  private String file;
 }

@@ -35,6 +35,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.http.MediaType;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -59,6 +61,11 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter implements Applicat
    */
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
     this.applicationContext = applicationContext;
+  }
+
+  @Override
+  public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+      configurer.mediaType("json", MediaType.APPLICATION_JSON);
   }
 
   @Override

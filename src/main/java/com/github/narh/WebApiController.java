@@ -25,34 +25,42 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.github.narh.cipher;
+package com.github.narh;
 
-import javax.crypto.Cipher;
+import java.io.BufferedReader;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author narita
  *
  */
-public enum CryptMode {
-    ENCRYPT(Cipher.ENCRYPT_MODE)      // 暗号化
-  , DECRYPT(Cipher.DECRYPT_MODE)      // 復号化
-  ;
+@RestController @Slf4j @RequestMapping("/api")
+public class WebApiController {
 
-  /**
-   * 暗号化モード
-   * 0: 暗号化
-   * 1: 復号化
-   */
-  public final Integer mode;
+  @RequestMapping(path="/file_decrypt", method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE)
+  public String fileDecryptApi(HttpServletRequest request) throws IOException {
+    log.info("Content-type: {}", request.getContentType());
+    StringBuilder jsonStr = new StringBuilder();
+    BufferedReader requestBodyReader = request.getReader();
+    String line;
+    while((line = requestBodyReader.readLine()) != null)
+      jsonStr.append(line);
+    requestBodyReader.close();
 
-  /** コンストラクタ */
-  private CryptMode(final int mode) {
-    this.mode = mode;
-  }
-
-  public CryptMode of(final int mode) throws UnsupportedOperationException {
-    for(CryptMode m : values())
-      if(m.mode == mode) return m;
-    throw new UnsupportedOperationException("not supported operation (" + mode + ")");
+    log.info("Contents:{}", jsonStr.toString());
+    ObjectMapper mapper = new ObjectMapper();
+    WebApiModel model = mapper.readValue(jsonStr.toString(), WebApiModel.class);
+    return mapper.writeValueAsString(model);
   }
 }

@@ -32,11 +32,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author narita
  *
  */
-@Controller
+@Controller @Slf4j
 public class WebAppController {
 
   @RequestMapping(path= {"/"}, method=RequestMethod.GET)
