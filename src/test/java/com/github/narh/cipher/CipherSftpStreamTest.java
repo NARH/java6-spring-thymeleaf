@@ -27,11 +27,27 @@
 
 package com.github.narh.cipher;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.MessageDigest;
 import java.security.Provider;
 import java.security.Security;
+import java.util.Arrays;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.swing.JOptionPane;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Test;
 
@@ -48,6 +64,14 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class CipherSftpStreamTest {
+  public static final byte[] SEED = "abcdef".getBytes();
+  public static final byte[] CIPHER_PASSPHRASE = "12345678".getBytes();
+
+  public static final String PAYLOAD_STRING = "Salted__";
+  public static final String KEY_ENCODING   = "AES";
+  public static final String ENCODING_MODE  = "AES/CBC/PKCS5PADDING";
+  public static String ORIGIN_NAME = "hoge";
+  public static String FILE_256_NAME = "hoge_256.enc";
 
   private String USER_NAME = "";
   private String HOSTNAME  = "";
@@ -57,6 +81,12 @@ public class CipherSftpStreamTest {
     Security.insertProviderAt(new BouncyCastleProvider(),1);
   }
 
+  /**
+   * 元ファイルをZip 圧縮し、AES-256-CBC で暗号化し、SFTPでリモートへ送信までする
+   * テストコード
+   *
+   * @throws Exception
+   */
   @Test
   public void testConnectSFTP() throws Exception {
     Provider[] providers = Security.getProviders();
@@ -95,6 +125,51 @@ public class CipherSftpStreamTest {
       channel.connect();
       SftpATTRS result = channel.lstat(".");
       log.info("ls results is {}", result);
+
+      Cipher cipher = Cipher.getInstance(ENCODING_MODE);
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
+      md.reset();
+      md.update(SEED);
+      md.update(CIPHER_PASSPHRASE);
+      byte[] salt = Arrays.copyOfRange(md.digest(), 0,8);
+      log.info("salt is {}.", Hex.encodeHexString(salt).toUpperCase());
+      byte[] secretKey = CiperZipArchveTest.openSSLEvpBytesToKey(CIPHER_PASSPHRASE, salt, md, 1, null);
+      log.info("secret key is {}.", Hex.encodeHexString(secretKey).toUpperCase());
+      byte[] iv = Arrays.copyOfRange(
+          CiperZipArchveTest.openSSLEvpBytesToKey(CIPHER_PASSPHRASE, salt, md, 1, secretKey), 0, 16);
+      log.info("iv is {}.", Hex.encodeHexString(iv).toUpperCase());
+
+      cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(secretKey, KEY_ENCODING)
+          , new IvParameterSpec(iv));
+
+      OutputStream channelOutputStream = channel.put("hoge.enc", ChannelSftp.OVERWRITE);
+      channelOutputStream.write(ArrayUtils.addAll(PAYLOAD_STRING.getBytes(), salt));
+      CipherOutputStream cipherOutputStream = new CipherOutputStream(channelOutputStream, cipher);
+      ZipOutputStream zipOutput = new ZipOutputStream(cipherOutputStream);
+
+      File archiveFiles = new File(
+          getClass().getClassLoader().getResource(ORIGIN_NAME).toURI());
+      zipOutput.putNextEntry(new ZipEntry(archiveFiles.getName()));
+
+      InputStream in = new BufferedInputStream(new FileInputStream(archiveFiles));
+      byte[] buf = new byte[1024];
+      int len = 0;
+      while ((len = in.read(buf)) != -1) {
+        zipOutput.write(buf, 0, len);
+        zipOutput.flush();
+        cipherOutputStream.flush();
+        channelOutputStream.flush();
+      }
+      zipOutput.flush();
+      cipherOutputStream.flush();
+      channelOutputStream.flush();
+
+      IOUtils.closeQuietly(in);
+      IOUtils.closeQuietly(zipOutput);
+      IOUtils.closeQuietly(cipherOutputStream);
+      IOUtils.closeQuietly(channelOutputStream);
+
+      channel.disconnect();
     }
     session.disconnect();
   }
