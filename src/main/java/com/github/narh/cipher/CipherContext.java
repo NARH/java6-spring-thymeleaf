@@ -50,4 +50,8 @@ public class CipherContext {
   private byte[] origin;
   /** 暗号化・復号化後データ */
   private byte[] contents;
+  /* 規定ディレクトリ */
+  private String baseDirectoryName;
+  /* 作成ファイル名 */
+  private String writeFileName;
 }

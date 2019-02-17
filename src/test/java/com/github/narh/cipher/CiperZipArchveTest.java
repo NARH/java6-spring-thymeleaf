@@ -55,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class CIperZipArchveTest {
+public class CiperZipArchveTest {
 
   public static final byte[] SEED = "abcdef".getBytes();
   public static final byte[] PASSPHRASE = "12345678".getBytes();

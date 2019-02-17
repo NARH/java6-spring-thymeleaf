@@ -131,5 +131,13 @@ public class Utils {
     }
     return results;
   }
+
+  /**
+   * @param context
+   */
+  public static void writeContestsToFile(CipherContext context) {
+    // TODO 自動生成されたメソッド・スタブ
+
+  }
 }
 
