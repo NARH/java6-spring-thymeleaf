@@ -102,9 +102,9 @@ public class AES256CBCTest {
     File file = new File(filePath.toURI());
 
     byte[] origin = Utils.getContentsByFile(file);
-    byte[] salt = Utils.getSaltByOpenSSLCryptFiles(origin);
-    byte[] secretKey = Utils.generateSecretKey(PASSPHRASE.getBytes(), salt);
-    byte[] iv = Utils.generateIV(PASSPHRASE.getBytes(), salt, secretKey);
+    byte[] salt = CipherAESUtils.getSaltByOpenSSLCryptFiles(origin);
+    byte[] secretKey = CipherAESUtils.generateSecretKey(PASSPHRASE.getBytes(), salt);
+    byte[] iv = CipherAESUtils.generateIV(PASSPHRASE.getBytes(), salt, secretKey);
 
     CipherContext context = CipherContext.builder()
         .cryptMode(CryptMode.ENCRYPT)
@@ -132,9 +132,9 @@ public class AES256CBCTest {
     File file = new File(filePath.toURI());
 
     byte[] encoded = Utils.getContentsByFile(file);
-    byte[] salt = Utils.getSaltByOpenSSLCryptFiles(encoded);
-    byte[] secretKey = Utils.generateSecretKey(PASSPHRASE.getBytes(), salt);
-    byte[] iv = Utils.generateIV(PASSPHRASE.getBytes(), salt, secretKey);
+    byte[] salt = CipherAESUtils.getSaltByOpenSSLCryptFiles(encoded);
+    byte[] secretKey = CipherAESUtils.generateSecretKey(PASSPHRASE.getBytes(), salt);
+    byte[] iv = CipherAESUtils.generateIV(PASSPHRASE.getBytes(), salt, secretKey);
     log.info("encrypted data size {}", encoded.length);
     log.info("encrypted data {}", Hex.encodeHexString(encoded).toUpperCase());
 

@@ -36,7 +36,7 @@ public class OpenSSLFileTest {
     log.info("base directory is {}.", parentDir.getAbsolutePath());
 
     byte[] origin = Utils.getContentsByFile(file);
-    byte[] salt = Utils.getSaltByOpenSSLCryptFiles(origin);
+    byte[] salt = CipherAESUtils.getSaltByOpenSSLCryptFiles(origin);
     MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
     byte[][] keyAndIV = EVP_BytesToKey(32, 16, md, salt, PASSPHRASE.getBytes(), 1);
     byte[] secretKey = keyAndIV[0];
@@ -74,7 +74,7 @@ public class OpenSSLFileTest {
 
     File file = new File(getClass().getClassLoader().getResource(FILE_NAME).toURI());
     byte[] origin = Utils.getContentsByFile(file);
-    byte[] salt = Utils.getSaltByOpenSSLCryptFiles(origin);
+    byte[] salt = CipherAESUtils.getSaltByOpenSSLCryptFiles(origin);
     PBEKeySpec keySpec = new PBEKeySpec(PASSPHRASE.toCharArray(), salt, iterateCount, keyLengh);
     SecretKeyFactory skf = SecretKeyFactory.getInstance(ALGORITHM);
     SecretKey sk = skf.generateSecret(keySpec);
@@ -87,7 +87,7 @@ public class OpenSSLFileTest {
     log.info("start");
     File file = new File(getClass().getClassLoader().getResource(FILE_NAME).toURI());
     byte[] origin = Utils.getContentsByFile(file);
-    byte[] salt = Utils.getSaltByOpenSSLCryptFiles(origin);
+    byte[] salt = CipherAESUtils.getSaltByOpenSSLCryptFiles(origin);
     MessageDigest messageDigest = MessageDigest.getInstance(HASH_ALGORITHM);
     byte[] keyDigest = openSSLEvpBytesToKey(PASSPHRASE.getBytes(), salt, messageDigest);
     log.info("key digest is {}.", Hex.encodeHexString(keyDigest));

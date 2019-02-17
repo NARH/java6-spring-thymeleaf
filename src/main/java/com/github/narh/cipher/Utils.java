@@ -34,10 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,60 +44,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class Utils {
-
-  /**
-   * OpenSSL によって暗号化されたデータファイルよりSALTを取得します。
-   *
-   * @param contents OpenSSL によって暗号化されたデータ
-   * @return SALT データ
-   */
-  public static byte[] getSaltByOpenSSLCryptFiles(final byte[] contents) {
-    if(null == contents || 16 > contents.length) throw new IllegalArgumentException("data size error.");
-    byte[] salt = new byte[8];
-    salt = Arrays.copyOfRange(contents, 8, 16);
-    if(log.isTraceEnabled()) log.trace("SALT is {}.", Hex.encodeHexString(salt));
-    return salt;
-  }
-
-  /**
-   * OpenSSL 方式でパスフレーズとSALTから共通鍵を生成する
-   * @param passphrase パスフレーズ
-   * @param salt SALT
-   * @return 共通鍵データ
-   */
-  public static byte[] generateSecretKey(final byte[] passphrase, final byte[] salt) {
-    byte[] secretKey = new byte[64];
-    byte[] secretKey1 = new byte[32];
-    byte[] secretKey2 = new byte[32];
-    if(null != salt) {
-      secretKey1 = DigestUtils.md5(ArrayUtils.addAll(passphrase, salt));
-      secretKey2 = DigestUtils.md5(ArrayUtils.addAll(secretKey1, ArrayUtils.addAll(passphrase, salt)));
-    }
-    else {
-      secretKey1 = DigestUtils.md5(passphrase);
-      secretKey2 = DigestUtils.md5(ArrayUtils.addAll(secretKey1, passphrase));
-    }
-    secretKey = ArrayUtils.addAll(secretKey1, secretKey2);
-    if(log.isTraceEnabled()) log.trace("SECRET KEY is {}.", Hex.encodeHexString(secretKey));
-    return secretKey;
-  }
-
-  /**
-   * 共通鍵、パスフレーズ、SALT より初期化ベクトルを生成する
-   * @param passphrase パスフレーズ
-   * @param salt SALT
-   * @param secretKey 共通鍵
-   * @return 初期化ベクトルデータ
-   */
-  public static byte[] generateIV(final byte[] passphrase, final byte[] salt, final byte[] secretKey) {
-    byte[] iv = new byte[32];
-    byte[] secretKey2 = new byte[32];
-    secretKey2 = Arrays.copyOfRange(secretKey, 16, secretKey.length);
-    if(log.isTraceEnabled()) log.trace("SECRET KEY use {}.", Hex.encodeHexString(secretKey2));
-    iv = DigestUtils.md5(ArrayUtils.addAll(secretKey2, ArrayUtils.addAll(passphrase, salt)));
-    if(log.isTraceEnabled()) log.trace("IV is {}.", Hex.encodeHexString(iv));
-    return iv;
-  }
 
   /**
    * 指定したファイルのデータを取得する
