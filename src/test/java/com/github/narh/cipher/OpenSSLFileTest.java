@@ -50,7 +50,7 @@ public class OpenSSLFileTest {
     log.info("iv is {}.", Hex.encodeHexString(iv));
 
     CipherContext context = CipherContext.builder()
-        .cryptMode(CryptMode.DECRYPT)
+        .cryptMode(CipherOperationMode.DECRYPT)
         .passphrase(PASSPHRASE.getBytes())
         .salt(salt)
         .secretKey(secretKey)

@@ -27,31 +27,30 @@
 
 package com.github.narh.cipher;
 
-import lombok.Builder;
-import lombok.Data;
-
 /**
  * @author narita
  *
  */
-@Data @Builder
-public class CipherContext {
-  /** モード */
-  private final CipherOperationMode cryptMode;
-  /** パスフレーズ */
-  private final byte[] passphrase;
-  /** salt */
-  private final byte[] salt;
-  /** 鍵データ */
-  private final byte[] secretKey;
-  /** 初期化ベクトル */
-  private final byte[] iv;
-  /** 対象データ */
-  private byte[] origin;
-  /** 暗号化・復号化後データ */
-  private byte[] contents;
-  /* 規定ディレクトリ */
-  private String baseDirectoryName;
-  /* 作成ファイル名 */
-  private String writeFileName;
+public enum CipherAlgorithm {
+    AES128CBC("AES/CBC/PKCS5PADDING", 128, true)
+  , AES256CBC("AES/CBC/PKCS5PADDING", 256, true)
+  ;
+
+  public static final String SEPARATOR = "/";
+  public final String transration;
+  public final long length;
+  public final boolean useIV;
+
+  private String[] parseData;
+
+  private CipherAlgorithm(final String transration, final long length, boolean useIV) {
+    this.transration = transration;
+    this.useIV = useIV;
+    this.length = length;
+    this.parseData = transration.split(SEPARATOR);
+  }
+
+  public String algorithm() {
+    return parseData[0];
+  }
 }

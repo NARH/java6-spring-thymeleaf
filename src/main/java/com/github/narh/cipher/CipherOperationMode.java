@@ -33,7 +33,7 @@ import javax.crypto.Cipher;
  * @author narita
  *
  */
-public enum CryptMode {
+public enum CipherOperationMode {
     ENCRYPT(Cipher.ENCRYPT_MODE)      // 暗号化
   , DECRYPT(Cipher.DECRYPT_MODE)      // 復号化
   ;
@@ -46,12 +46,12 @@ public enum CryptMode {
   public final Integer mode;
 
   /** コンストラクタ */
-  private CryptMode(final int mode) {
+  private CipherOperationMode(final int mode) {
     this.mode = mode;
   }
 
-  public CryptMode of(final int mode) throws UnsupportedOperationException {
-    for(CryptMode m : values())
+  public CipherOperationMode of(final int mode) throws UnsupportedOperationException {
+    for(CipherOperationMode m : values())
       if(m.mode == mode) return m;
     throw new UnsupportedOperationException("not supported operation (" + mode + ")");
   }

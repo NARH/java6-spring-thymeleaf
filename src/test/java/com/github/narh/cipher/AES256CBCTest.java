@@ -107,7 +107,7 @@ public class AES256CBCTest {
     byte[] iv = CipherAESUtils.generateIV(PASSPHRASE.getBytes(), salt, secretKey);
 
     CipherContext context = CipherContext.builder()
-        .cryptMode(CryptMode.ENCRYPT)
+        .cryptMode(CipherOperationMode.ENCRYPT)
         .salt(salt)
         .secretKey(secretKey)
         .iv(iv)
@@ -143,7 +143,7 @@ public class AES256CBCTest {
     byte[] origin = Utils.getContentsByFile(originFile);
 
     CipherContext context = CipherContext.builder()
-        .cryptMode(CryptMode.ENCRYPT)
+        .cryptMode(CipherOperationMode.ENCRYPT)
         .passphrase(PASSPHRASE.getBytes())
         .salt(salt)
         .secretKey(secretKey)
@@ -159,7 +159,7 @@ public class AES256CBCTest {
     log.info("encrypt data {}", Hex.encodeHexString(context.getContents()).toUpperCase());
 
     CipherContext context2 = CipherContext.builder()
-        .cryptMode(CryptMode.DECRYPT)
+        .cryptMode(CipherOperationMode.DECRYPT)
         .passphrase(PASSPHRASE.getBytes())
         .salt(salt)
         .secretKey(secretKey)
