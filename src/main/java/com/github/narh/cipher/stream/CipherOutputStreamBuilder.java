@@ -48,9 +48,9 @@ import lombok.ToString;
  *
  */
 @ToString
-public abstract class CipherOutputStreamBuilder {
+public class CipherOutputStreamBuilder {
 
-  protected CipherOperationMode opration;
+  protected CipherOperationMode operation;
   protected CipherAlgorithm algorithm;
   protected byte[] secretkey;
   protected byte[] iv;
@@ -58,6 +58,11 @@ public abstract class CipherOutputStreamBuilder {
 
   public CipherOutputStreamBuilder algorithm(final CipherAlgorithm algorithm) {
     this.algorithm = algorithm;
+    return this;
+  }
+
+  public CipherOutputStreamBuilder operation(final CipherOperationMode operation) {
+    this.operation = operation;
     return this;
   }
 
@@ -81,10 +86,10 @@ public abstract class CipherOutputStreamBuilder {
      valid();
      Cipher cipher = Cipher.getInstance(algorithm.transration);
      if(algorithm.useIV) {
-       cipher.init(opration.mode, new SecretKeySpec(secretkey, algorithm.algorithm()), new IvParameterSpec(iv));
+       cipher.init(operation.mode, new SecretKeySpec(secretkey, algorithm.algorithm()), new IvParameterSpec(iv));
      }
      else {
-       cipher.init(opration.mode, new SecretKeySpec(secretkey, algorithm.algorithm()));
+       cipher.init(operation.mode, new SecretKeySpec(secretkey, algorithm.algorithm()));
      }
      return new CipherOutputStream(outputStream, cipher);
    }
@@ -107,21 +112,21 @@ public abstract class CipherOutputStreamBuilder {
    * @return
    */
   private boolean validOperationMode() {
-    return (null != opration);
+    return (null != operation);
   }
 
   /**
    * @return
    */
   private boolean validSecretkey() {
-    return (null != secretkey && algorithm.length < secretkey.length);
+    return (null != secretkey && algorithm.length / 8 <= secretkey.length);
   }
 
   /**
    * @return
    */
   protected boolean validIv() {
-    return (null != iv && 16 < iv.length);
+    return (null != iv && 16 <= iv.length);
   }
 
   /**

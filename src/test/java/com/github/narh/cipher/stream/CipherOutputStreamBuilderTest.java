@@ -38,12 +38,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 
-import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.junit.Test;
 
 import com.github.narh.cipher.CipherAlgorithm;
@@ -56,10 +56,10 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class CipherInputStreamBuilderTest {
+public class CipherOutputStreamBuilderTest {
 
   @Test
-  public void test128bit読み込み正常系() throws Exception {
+  public void test128bit書き込み正常系() throws Exception {
     log.info("test start.");
     /* 仕込み */
     byte[] salt = Hex.decodeHex("3228F10D3D2D1CC0");
@@ -71,51 +71,49 @@ public class CipherInputStreamBuilderTest {
     byte[] iv = Hex.decodeHex("28ED23032405BE59D9CB204E7A286FE9");
     log.debug("salt is {}.", Hex.encodeHexString(iv));
 
-    String targetFileName = "hoge_128.enc";
-    InputStream input = new FileInputStream(new File(getClass().getClassLoader().getResource(targetFileName).toURI()));
-    byte[] payload = new byte[16];
-    int readed = input.read(payload);
-    String payloadStr = new String(Arrays.copyOfRange(payload, 0, 8));
-    log.debug("payload is {}.", payloadStr);
-    assertThat("PAYLOAD が Salted__ であること", payloadStr, is("Salted__"));
-    byte[] readSalt = Arrays.copyOfRange(payload, 8, 16);
-    log.debug("read SALT is {}.", Hex.encodeHexString(readSalt));
-    assertThat("16bytes 読み取ること", readed, is(16));
-    assertThat("SALTが一致していること", readSalt, is(salt));
+    File origFile = new File(getClass().getClassLoader().getResource("hoge").toURI());
+    File parentDir = origFile.getAbsoluteFile().getParentFile().getParentFile().getParentFile();
+    byte[] payload = ArrayUtils.addAll("Salted__".getBytes(), salt);
 
-    /* InputStream 試験 */
-    CipherInputStreamBuilder builder = new CipherInputStreamBuilder();
-    CipherInputStream cipherInputStream = builder
+    String destFileName = "hoge_128.enc";
+    File destFile = new File(parentDir.getAbsolutePath() + File.separator + destFileName);
+    OutputStream output = new FileOutputStream(destFile);
+    output.write(payload);
+    output.flush();
+
+    /* OutputStream 試験 */
+    CipherOutputStreamBuilder builder = new CipherOutputStreamBuilder();
+    CipherOutputStream cipherOutputStream = builder
       .algorithm(CipherAlgorithm.AES128CBC)
-      .operation(CipherOperationMode.DECRYPT)
-      .inputStream(input)
+      .operation(CipherOperationMode.ENCRYPT)
+      .outputStream(output)
       .secretkey(secretKey)
       .iv(iv)
       .build();
 
-    String outputFileName = "hoge.txt";
-    File parentPath = new File(getClass().getClassLoader().getResource(targetFileName).toURI())
-        .getParentFile().getParentFile().getParentFile();
-    File outputFile = new File(parentPath.getAbsolutePath() + File.separator + outputFileName);
-    OutputStream output = new FileOutputStream(outputFile);
-    IOUtils.copy(cipherInputStream, output);
-    /* 後始末 */
-    IOUtils.closeQuietly(output);
-    IOUtils.closeQuietly(cipherInputStream);
+    InputStream origInputStream = getClass().getClassLoader().getResourceAsStream("hoge");
+    IOUtils.copy(origInputStream, cipherOutputStream);
+    cipherOutputStream.flush();
+    output.flush();
 
-    assertThat("復号したファイルが存在すること", outputFile.exists(), is(true));
-    InputStream destData = new BufferedInputStream(new FileInputStream(outputFile));
+    /* 後始末 */
+    IOUtils.closeQuietly(cipherOutputStream);
+    IOUtils.closeQuietly(output);
+
+    assertThat("復号したファイルが存在すること", destFile.exists(), is(true));
+
+    InputStream destData = new BufferedInputStream(new FileInputStream(destFile));
     ByteArrayOutputStream dest = new  ByteArrayOutputStream();
     IOUtils.copy(destData, dest);
     IOUtils.closeQuietly(destData);
-    InputStream origData = getClass().getClassLoader().getResourceAsStream("hoge");
+    InputStream origData = getClass().getClassLoader().getResourceAsStream("hoge_128.enc");
     ByteArrayOutputStream orig = new ByteArrayOutputStream();
     IOUtils.copy(origData, orig);
     IOUtils.closeQuietly(origData);
     assertThat("元ファイルと同じであること", dest.toByteArray(), is(orig.toByteArray()));
     IOUtils.closeQuietly(dest);
     IOUtils.closeQuietly(orig);
-    outputFile.delete();
+    destFile.delete();
     log.info("test end.");
   }
 }
