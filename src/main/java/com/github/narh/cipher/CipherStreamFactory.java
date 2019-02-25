@@ -32,15 +32,14 @@ import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Properties;
 import java.util.zip.ZipOutputStream;
 
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
 
-import com.github.narh.cipher.stream.CipherInputStreamBuilder;
-import com.github.narh.cipher.stream.CipherOutputStreamBuilder;
+import com.github.narh.cipher.io.CipherInputStream;
+import com.github.narh.cipher.io.CipherInputStreamBuilder;
+import com.github.narh.cipher.io.CipherOutputStream;
+import com.github.narh.cipher.io.CipherOutputStreamBuilder;
 
 /**
  * @author narita
@@ -48,84 +47,28 @@ import com.github.narh.cipher.stream.CipherOutputStreamBuilder;
  */
 public class CipherStreamFactory {
 
-  private final Properties prop;
-
-  public CipherStreamFactory(final Properties prop) {
-    this.prop = prop;
-  }
-
   public CipherInputStream getEncryptInputStream(InputStream inputStream)
-    throws Exception {
-    try {
-      return new CipherInputStreamBuilder().build();
-    } catch (InvalidKeyException e) {
-      throw e;
-    } catch (NoSuchAlgorithmException e) {
-      throw e;
-    } catch (NoSuchPaddingException e) {
-      throw e;
-    } catch (InvalidAlgorithmParameterException e) {
-      throw e;
-    }
+      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException {
+    return new CipherInputStreamBuilder().build();
   }
 
   public CipherInputStream getDecryptInputStream(InputStream inputStream)
-    throws Exception {
-    try {
-      return new CipherInputStreamBuilder().build();
-    } catch (InvalidKeyException e) {
-      throw e;
-    } catch (NoSuchAlgorithmException e) {
-      throw e;
-    } catch (NoSuchPaddingException e) {
-      throw e;
-    } catch (InvalidAlgorithmParameterException e) {
-      throw e;
-    }
+      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException {
+    return new CipherInputStreamBuilder().build();
   }
 
   public CipherOutputStream getEncryptOutputStream(OutputStream outputStream)
-    throws Exception {
-    try {
-      return new CipherOutputStreamBuilder().build();
-    } catch (InvalidKeyException e) {
-      throw e;
-    } catch (NoSuchAlgorithmException e) {
-      throw e;
-    } catch (NoSuchPaddingException e) {
-      throw e;
-    } catch (InvalidAlgorithmParameterException e) {
-      throw e;
-    }
+      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException {
+    return new CipherOutputStreamBuilder().build();
   }
 
   public CipherOutputStream getDecryptOutputStream(OutputStream outputStream)
-    throws Exception {
-    try {
-      return new CipherOutputStreamBuilder().build();
-    } catch (InvalidKeyException e) {
-      throw e;
-    } catch (NoSuchAlgorithmException e) {
-      throw e;
-    } catch (NoSuchPaddingException e) {
-      throw e;
-    } catch (InvalidAlgorithmParameterException e) {
-      throw e;
-    }
+      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException {
+    return new CipherOutputStreamBuilder().build();
   }
 
   public ZipOutputStream getZipOutputStream(OutputStream outputStream)
-    throws Exception {
-    try {
-      return new ZipOutputStream(new CipherOutputStreamBuilder().build());
-    } catch (InvalidKeyException e) {
-      throw e;
-    } catch (NoSuchAlgorithmException e) {
-      throw e;
-    } catch (NoSuchPaddingException e) {
-      throw e;
-    } catch (InvalidAlgorithmParameterException e) {
-      throw e;
-    }
+      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException {
+    return new ZipOutputStream(new CipherOutputStreamBuilder().build());
   }
 }

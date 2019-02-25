@@ -25,54 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.github.narh.cipher.command;
+package com.github.narh.cipher.io;
 
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
-import com.github.narh.cipher.CipherContext;
+import java.io.Serializable;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * @author narita
  *
  */
-@Data @EqualsAndHashCode(callSuper=false)
-public class AES128CBCCryptCommand extends AbstractAESCryptCommand implements CryptCommand {
+@Data
+public class CipherConfig implements Serializable {
 
-  public static final String KEY_ENCODING   = "AES";
-  public static final String ENCODING_MODE  = "AES/CBC/PKCS5PADDING";
+  private String algorithm;
 
-  public boolean USE_MESSAGE_DIGEST         = false;
+  private String hashAlgorithm;
 
-  /* (非 Javadoc)
-   * @see com.github.narh.cipher.command.AbstractAESCryptCommand#getEncodingMode()
-   */
-  @Override
-  protected String getEncodingMode() {
-    return ENCODING_MODE;
-  }
-
-  /* (非 Javadoc)
-   * @see com.github.narh.cipher.command.AbstractAESCryptCommand#getSecretKeySpec()
-   */
-  @Override
-  protected Key getSecretKeySpec(final CipherContext context)
-      throws NoSuchAlgorithmException {
-    return new SecretKeySpec(context.getSecretKey(), KEY_ENCODING);
-  }
-
-  /* (非 Javadoc)
-   * @see com.github.narh.cipher.command.AbstractAESCryptCommand#getIvParameterSpec()
-   */
-  @Override
-  protected IvParameterSpec getIvParameterSpec(final CipherContext context) {
-    return new IvParameterSpec(context.getIv());
-  }
-
+  private String password;
 }
