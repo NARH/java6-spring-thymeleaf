@@ -55,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CipherStreamFactoryTest {
 
   @Test
-  public void testGetEncryptInputStream() throws Exception {
+  public void testGetDecryptInputStream() throws Exception {
     String password  = "password12345";
     byte[] salt = Hex.decodeHex("57010827E1A17C40".toCharArray());
     byte[] secretKey = CipherAESUtils.generateSecretKey(password.getBytes(), salt);
@@ -100,7 +100,7 @@ public class CipherStreamFactoryTest {
   }
 
   @Test
-  public void testGetEncryptInputStream2() throws Exception {
+  public void testGetDecryptInputStream2() throws Exception {
     String password  = "password12345";
     byte[] salt = Hex.decodeHex("0AF8B367697D3312".toCharArray());
     byte[] secretKey = CipherAESUtils.generateSecretKey(password.getBytes(), salt);

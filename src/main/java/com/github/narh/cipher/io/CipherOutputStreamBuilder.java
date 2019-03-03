@@ -47,13 +47,13 @@ import lombok.ToString;
  *
  */
 @ToString
-public class CipherOutputStreamBuilder {
+public class CipherOutputStreamBuilder extends AbstractCipherStreamBuilder {
 
-  protected CipherOperationMode operation;
-  protected CipherAlgorithm algorithm;
-  protected byte[] secretkey;
-  protected byte[] iv;
   protected OutputStream outputStream;
+
+  public CipherOutputStreamBuilder() {
+    super();
+  }
 
   public CipherOutputStreamBuilder algorithm(final CipherAlgorithm algorithm) {
     this.algorithm = algorithm;
@@ -94,44 +94,18 @@ public class CipherOutputStreamBuilder {
    }
 
    protected void valid() {
-     if(validAlgorithm() && validOperationMode() && validSecretkey() && validIv() && validOutputStream()) {
-       return;
-     }
-     throw new IllegalArgumentException("bad context parameter.[" + toString() + "]");
+     validAlgorithm();
+     validOperationMode();
+     validSecretkey();
+     validIv();
+     validOutputStream();
    }
 
   /**
    * @return
    */
-  private boolean validAlgorithm() {
-    return (null != algorithm);
-  }
-
-  /**
-   * @return
-   */
-  private boolean validOperationMode() {
-    return (null != operation);
-  }
-
-  /**
-   * @return
-   */
-  private boolean validSecretkey() {
-    return (null != secretkey && algorithm.length / 8 <= secretkey.length);
-  }
-
-  /**
-   * @return
-   */
-  protected boolean validIv() {
-    return (null != iv && 16 <= iv.length);
-  }
-
-  /**
-   * @return
-   */
-  protected boolean validOutputStream() {
-    return (null != outputStream);
+  void validOutputStream() throws IllegalArgumentException{
+    if(null != outputStream)
+      throw new IllegalArgumentException("OutStream is not setting.");
   }
 }

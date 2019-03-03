@@ -47,13 +47,13 @@ import lombok.ToString;
  *
  */
 @ToString
-public class CipherInputStreamBuilder {
+public class CipherInputStreamBuilder extends AbstractCipherStreamBuilder {
 
-  protected CipherOperationMode operation;
-  protected CipherAlgorithm algorithm;
-  protected byte[] secretkey;
-  protected byte[] iv;
   protected InputStream inputStream;
+
+  public CipherInputStreamBuilder() {
+    super();
+  }
 
   public CipherInputStreamBuilder algorithm(final CipherAlgorithm algorithm) {
     this.algorithm = algorithm;
@@ -80,7 +80,7 @@ public class CipherInputStreamBuilder {
     return this;
   }
 
-   public CipherInputStream build() throws NoSuchAlgorithmException, NoSuchPaddingException
+  public CipherInputStream build() throws NoSuchAlgorithmException, NoSuchPaddingException
      , InvalidKeyException, InvalidAlgorithmParameterException {
      valid();
      Cipher cipher = Cipher.getInstance(algorithm.transration);
@@ -94,44 +94,18 @@ public class CipherInputStreamBuilder {
    }
 
    protected void valid() {
-     if(validAlgorithm() && validOperationMode() && validSecretkey() && validIv() && validInputStream()) {
-       return;
-     }
-     throw new IllegalArgumentException("bad context parameter.[" + toString() + "]");
+     validAlgorithm();
+     validOperationMode();
+     validSecretkey();
+     validIv();
+     validInputStream();
    }
 
-  /**
-   * @return
-   */
-  private boolean validAlgorithm() {
-    return (null != algorithm);
-  }
-
-  /**
-   * @return
-   */
-  private boolean validOperationMode() {
-    return (null != operation);
-  }
-
-  /**
-   * @return
-   */
-  private boolean validSecretkey() {
-    return (null != secretkey && algorithm.length / 8 <= secretkey.length);
-  }
-
-  /**
-   * @return
-   */
-  protected boolean validIv() {
-    return (null != iv && 16 <= iv.length);
-  }
-
-  /**
-   * @return
-   */
-  protected boolean validInputStream() {
-    return (null != inputStream);
-  }
+   /**
+    * @return
+    */
+   void validInputStream() throws IllegalArgumentException {
+     if(null != inputStream)
+       throw new IllegalArgumentException("InputStream is not setting.");
+   }
 }

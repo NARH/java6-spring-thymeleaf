@@ -52,18 +52,29 @@ public class CipherInputStream extends FilterInputStream {
   private boolean closed = false;
 
   /**
-   * @param arg0
+   * @param is インプットストリーム
    */
   protected CipherInputStream(InputStream is) {
     super(is);
     input = is;
     cipher = new NullCipher();
   }
+
+  /**
+   * コンストラクタ
+   * @param is インプットストリーム
+   * @param c java.crypto.Cipher 暗号化変換
+   */
   public CipherInputStream(InputStream is, Cipher c) {
     super(is);
     input = is;
     cipher = c;
   }
+
+  /**
+   * ストリームを読み込む
+   * @see java.io.InputStream#read()
+   */
   public int read() throws IOException {
     if (ostart >= ofinish) {
         // we loop for new data as the spec says we are blocking
@@ -73,9 +84,18 @@ public class CipherInputStream extends FilterInputStream {
     }
     return ((int) obuffer[ostart++] & 0xff);
   }
+  /**
+   * ストリームを読み込む
+   * @see java.io.InputStream#read(byte[])
+   */
   public int read(byte b[]) throws IOException {
     return read(b, 0, b.length);
   }
+  /**
+   * 暗号化変換器を利用して読み込む
+   * @return 変換したデータ
+   * @throws IOException 読み込み例外
+   */
   private int getMoreData() throws IOException {
     if (done) return -1;
     int readin = input.read(ibuffer);
@@ -112,6 +132,10 @@ public class CipherInputStream extends FilterInputStream {
     ofinish = (obuffer == null) ? 0 : obuffer.length;
     return ofinish;
   }
+  /**
+   * ストリームを読み込む
+   * @see java.io.InputStream#read(byte[], int, int)
+   */
   public int read(byte b[], int off, int len) throws IOException {
     if (ostart >= ofinish) {
         int i = 0;
@@ -129,6 +153,10 @@ public class CipherInputStream extends FilterInputStream {
     ostart = ostart + available;
     return available;
   }
+  /**
+   * 指定したサイズスキップする
+   * @see java.io.InputStream#skip(long)
+   */
   public long skip(long n) throws IOException {
     int available = ofinish - ostart;
     if (n > available) {
@@ -140,9 +168,17 @@ public class CipherInputStream extends FilterInputStream {
     ostart += n;
     return n;
   }
+  /**
+   * 読み込み可能なサイズを取得する
+   * @see java.io.InputStream#available()
+   */
   public int available() throws IOException {
     return (ofinish - ostart);
   }
+  /**
+   * ストリームを閉じる
+   * @see java.io.InputStream#close()
+   */
   public void close() throws IOException {
     if (closed) {
         return;
@@ -163,6 +199,10 @@ public class CipherInputStream extends FilterInputStream {
     ostart = 0;
     ofinish = 0;
   }
+  /**
+   * 読み取り位置をマーク可能か返却する
+   * @see java.io.InputStream#markSupported()
+   */
   public boolean markSupported() {
     return false;
   }

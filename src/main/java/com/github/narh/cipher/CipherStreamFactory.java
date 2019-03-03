@@ -47,6 +47,15 @@ import com.github.narh.cipher.io.CipherOutputStreamBuilder;
  */
 public class CipherStreamFactory {
 
+  private static CipherStreamFactory instance = new CipherStreamFactory();
+
+  private CipherStreamFactory() {
+  }
+
+  public static CipherStreamFactory getInstance() {
+    return instance;
+  }
+
   public CipherInputStream getEncryptInputStream(InputStream inputStream)
       throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException {
     return new CipherInputStreamBuilder().build();

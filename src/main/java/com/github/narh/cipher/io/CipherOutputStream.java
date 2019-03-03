@@ -47,16 +47,29 @@ public class CipherOutputStream extends FilterOutputStream {
   private byte[] obuffer;
   private boolean closed = false;
 
+  /**
+   * コンストラクタ
+   * @param os アウトプットストリーム
+   * @param c java.crypto.Cipher 暗号化変換
+   */
   public CipherOutputStream(OutputStream os, Cipher c) {
     super(os);
     output = os;
     cipher = c;
   }
+  /**
+   * コンストラクタ
+   * @param os アウトプットストリーム
+   */
   protected CipherOutputStream(OutputStream os) {
     super(os);
     output = os;
     cipher = new NullCipher();
   }
+  /**
+   * ストリームに書き込む
+   * @see java.io.OutputStream#write(int)
+   */
   public void write(int b) throws IOException {
     ibuffer[0] = (byte) b;
     obuffer = cipher.update(ibuffer, 0, 1);
@@ -65,9 +78,17 @@ public class CipherOutputStream extends FilterOutputStream {
         obuffer = null;
     }
   }
+  /**
+   * ストリームに書き込む
+   * @see java.io.OutputStream#write(byte[])
+   */
   public void write(byte b[]) throws IOException {
     write(b, 0, b.length);
   }
+  /**
+   * ストリームに書き込む
+   * @see java.io.OutputStream#write(byte[], int, int)
+   */
   public void write(byte b[], int off, int len) throws IOException {
     obuffer = cipher.update(b, off, len);
     if (obuffer != null) {
@@ -75,6 +96,10 @@ public class CipherOutputStream extends FilterOutputStream {
         obuffer = null;
     }
   }
+  /**
+   * 書き込みを確定する
+   * @see java.io.OutputStream#flush()
+   */
   public void flush() throws IOException {
     if (obuffer != null) {
         output.write(obuffer);
@@ -82,6 +107,10 @@ public class CipherOutputStream extends FilterOutputStream {
     }
     output.flush();
   }
+  /**
+   * ストリームを閉じる
+   * @see java.io.OutputStream#close()
+   */
   public void close() throws IOException {
     if (closed) {
         return;

@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.github.narh.cipher.io;
+package com.github.narh.cipher;
 
 import java.io.Serializable;
 

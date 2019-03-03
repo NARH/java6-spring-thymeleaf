@@ -25,26 +25,52 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.github.narh;
+package com.github.narh.cipher.io;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import lombok.extern.slf4j.Slf4j;
+import com.github.narh.cipher.CipherAlgorithm;
+import com.github.narh.cipher.CipherOperationMode;
 
 /**
  * @author narita
  *
  */
-@Controller @Slf4j
-public class WebAppController {
+public class AbstractCipherStreamBuilder {
 
-  @RequestMapping(path= {"/"}, method=RequestMethod.GET)
-  public String index(Model model) {
-    if(log.isInfoEnabled()) log.info("start controller");
-    if(log.isInfoEnabled()) log.info("end controller");
-    return "index";
+  protected CipherOperationMode operation;
+  protected CipherAlgorithm algorithm;
+  protected byte[] secretkey;
+  protected byte[] iv;
+
+  /**
+   * @return
+   */
+   void validAlgorithm() throws IllegalArgumentException{
+    if(null != algorithm)
+      throw new IllegalArgumentException("cipher algorithm is not setting.");
   }
+
+  /**
+   * @return
+   */
+  void validOperationMode() throws IllegalArgumentException{
+    if (null != operation)
+      throw new IllegalArgumentException("Cipher operation is not setting.");
+  }
+
+  /**
+   * @return
+   */
+  void validSecretkey() {
+    if(null != secretkey && algorithm.length / 8 <= secretkey.length)
+      throw new IllegalArgumentException("SecretKey is not setting or Invalid SecretKey.");
+  }
+
+  /**
+   * @return
+   */
+  void validIv() throws IllegalArgumentException {
+    if(null != iv && 16 <= iv.length)
+      throw new IllegalArgumentException("IV is not setting.");
+  }
+
 }
