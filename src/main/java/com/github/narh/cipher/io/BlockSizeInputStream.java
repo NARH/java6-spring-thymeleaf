@@ -27,50 +27,61 @@
 
 package com.github.narh.cipher.io;
 
-import com.github.narh.cipher.CipherAlgorithm;
-import com.github.narh.cipher.CipherOperationMode;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author narita
  *
  */
-public abstract class AbstractCipherStreamBuilder {
+public class BlockSizeInputStream extends FilterInputStream {
 
-  protected CipherOperationMode operation;
-  protected CipherAlgorithm algorithm;
-  protected byte[] secretkey;
-  protected byte[] iv;
+  public final int EOD = -1;
 
-  /**
-   * @return
-   */
-   void validAlgorithm() throws IllegalArgumentException{
-    if(null == algorithm)
-      throw new IllegalArgumentException("cipher algorithm is not setting.");
+  private boolean done = false;
+
+  public BlockSizeInputStream(InputStream in) {
+    super(in);
   }
 
   /**
-   * @return
+   * スタックにデータがある場合はスタックより1byte返却する
+   * 無い場合は、InputStream{@link #read()} より取得したデータを返却する
    */
-  void validOperationMode() throws IllegalArgumentException{
-    if (null == operation)
-      throw new IllegalArgumentException("Cipher operation is not setting.");
+  public int read() throws IOException {
+    return in.read();
   }
 
-  /**
-   * @return
-   */
-  void validSecretkey() {
-    if(null == secretkey || algorithm.length / 8 > secretkey.length)
-      throw new IllegalArgumentException("SecretKey is not setting or Invalid SecretKey.");
+  public int read(byte[] data, int offset, int length) throws IOException {
+    if(done) return EOD;
+    int bufferSize = Math.min(data.length, length);
+    int fetched = in.read(data, offset, bufferSize);
+    if (EOD == fetched) {
+      done = true;
+      return offset;
+    }
+    if((offset + fetched) == bufferSize) return bufferSize;
+    return read(data, offset + fetched, length);
   }
 
-  /**
-   * @return
-   */
-  void validIv() throws IllegalArgumentException {
-    if(null == iv || 16 > iv.length)
-      throw new IllegalArgumentException("IV is not setting.");
+  public int read(byte[] data) throws IOException {
+    return read(data, 0, data.length);
   }
 
+  public long skip(long n) throws IOException {
+    return in.skip(n);
+  }
+
+  public int available() throws IOException {
+    return in.available();
+  }
+
+  public void close() throws IOException {
+    in.close();
+  }
+
+  public boolean markSupported() {
+    return in.markSupported();
+  }
 }

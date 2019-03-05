@@ -105,7 +105,7 @@ public class CipherInputStreamBuilder extends AbstractCipherStreamBuilder {
     * @return
     */
    void validInputStream() throws IllegalArgumentException {
-     if(null != inputStream)
+     if(null == inputStream)
        throw new IllegalArgumentException("InputStream is not setting.");
    }
 }
