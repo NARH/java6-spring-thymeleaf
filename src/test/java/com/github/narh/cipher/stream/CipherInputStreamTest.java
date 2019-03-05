@@ -83,8 +83,8 @@ public class CipherInputStreamTest {
 
     BlockSizeInputStream bsis = new BlockSizeInputStream(in);
 
-//    byte[] data = new byte[300];
-    byte[] data = new byte[32];
+    int bufferSize = 300;
+    byte[] data = new byte[bufferSize];
     int readed = 0;
     int count = 0;
     StringBuilder stb = new StringBuilder();
@@ -93,7 +93,7 @@ public class CipherInputStreamTest {
     while((readed = bsis.read(data)) != -1) {
       stb.append(new String(data, "UTF-8"));
       log.info("[{}] readed size = {}", ++count, readed);
-      data = new byte[32];
+      Arrays.fill(data,(byte) 0);
     }
     bsis.close();
     log.info("data size is {}", stb.toString().trim().length());

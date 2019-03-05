@@ -54,15 +54,20 @@ public class BlockSizeInputStream extends FilterInputStream {
   }
 
   public int read(byte[] data, int offset, int length) throws IOException {
+    return read(data, offset, length, 0);
+  }
+
+  private int read(byte[] data, int offset, int length, int size) throws IOException {
     if(done) return EOD;
     int bufferSize = Math.min(data.length, length);
     int fetched = in.read(data, offset, bufferSize);
     if (EOD == fetched) {
       done = true;
-      return offset;
+      return (0 == size) ? EOD : size;
     }
-    if((offset + fetched) == bufferSize) return bufferSize;
-    return read(data, offset + fetched, length);
+    size += fetched;
+    if(size == bufferSize) return size;
+    return read(data, offset + size, length, size);
   }
 
   public int read(byte[] data) throws IOException {
