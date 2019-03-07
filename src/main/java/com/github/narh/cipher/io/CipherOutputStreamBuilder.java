@@ -105,7 +105,7 @@ public class CipherOutputStreamBuilder extends AbstractCipherStreamBuilder {
    * @return
    */
   void validOutputStream() throws IllegalArgumentException{
-    if(null != outputStream)
+    if(null == outputStream)
       throw new IllegalArgumentException("OutStream is not setting.");
   }
 }
