@@ -85,7 +85,12 @@ public class CipherZipOutputStreamTest {
         .build());
 
     zos.putNextEntry(new ZipEntry("foo.txt"));
-    in = new ByteArrayInputStream("これはテスト".getBytes(Charset.forName("UTF-8")));
+    in = new ByteArrayInputStream("これはテスト１".getBytes(Charset.forName("UTF-8")));
+    IOUtils.copy(in, zos);
+    IOUtils.closeQuietly(in);
+
+    zos.putNextEntry(new ZipEntry("bar.txt"));
+    in = new ByteArrayInputStream("これはテスト２".getBytes(Charset.forName("UTF-8")));
     IOUtils.copy(in, zos);
     IOUtils.closeQuietly(in);
     IOUtils.closeQuietly(zos);
