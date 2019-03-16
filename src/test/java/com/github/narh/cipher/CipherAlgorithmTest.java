@@ -27,38 +27,41 @@
 
 package com.github.narh.cipher;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+
+import org.junit.Test;
+
 /**
  * @author narita
  *
  */
-public enum CipherAlgorithm {
-    AES128CBC("AES/CBC/PKCS5PADDING", 128, true)
-  , AES256CBC("AES/CBC/PKCS5PADDING", 256, true)
-  ;
+public class CipherAlgorithmTest {
 
-  public static final String SEPARATOR = "/";
-  public final String transration;
-  public final long length;
-  public final boolean useIV;
+  @Test
+  public void testAlgorithm取得() throws Exception {
+    CipherAlgorithm aes128cbc = CipherAlgorithm.AES128CBC;
+    assertThat("AES128CBC のアルゴリズムは AES であること"
+        , aes128cbc.algorithm(), is("AES"));
+    assertThat("AES128CBC のオペレーションモードは CBC であること"
+        , aes128cbc.modeOfOperation(), is("CBC"));
+    assertThat("AES128CBC のパディング方式は PKCS5PADDING であること"
+        , aes128cbc.padding(), is("PKCS5PADDING"));
+    assertThat("AES128CBC の鍵長は128bit であること"
+        , aes128cbc.length, is((long)128));
+    assertThat("AES128CBC はIVを利用する"
+        , aes128cbc.useIV, is(true));
 
-  private String[] parseData;
-
-  private CipherAlgorithm(final String transration, final long length, boolean useIV) {
-    this.transration = transration;
-    this.useIV = useIV;
-    this.length = length;
-    this.parseData = transration.split(SEPARATOR);
-  }
-
-  public String algorithm() {
-    return parseData[0];
-  }
-
-  public String modeOfOperation() {
-    return parseData[1];
-  }
-
-  public String padding() {
-    return parseData[2];
+    CipherAlgorithm aes256cbc = CipherAlgorithm.AES256CBC;
+    assertThat("AES256 のアルゴリズムは AES であること"
+        , aes256cbc.algorithm(), is("AES"));
+    assertThat("AES256CBC のオペレーションモードは CBC であること"
+        , aes256cbc.modeOfOperation(), is("CBC"));
+    assertThat("AES256BC のパディング方式は PKCS5PADDING であること"
+        , aes256cbc.padding(), is("PKCS5PADDING"));
+    assertThat("AES256CBC の鍵長は128bit であること"
+        , aes256cbc.length, is((long)256));
+    assertThat("AES256CBC はIVを利用する"
+        , aes256cbc.useIV, is(true));
   }
 }
