@@ -34,15 +34,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.compress.utils.IOUtils;
-
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 
 /**
  * @author narita
  *
  */
-@Slf4j
 public class Utils {
 
   /**

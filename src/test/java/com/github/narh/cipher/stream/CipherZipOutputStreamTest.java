@@ -27,8 +27,14 @@
 
 package com.github.narh.cipher.stream;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,26 +42,26 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.Test;
 
 import com.github.narh.cipher.CipherAESUtils;
 import com.github.narh.cipher.CipherAlgorithm;
 import com.github.narh.cipher.CipherOperationMode;
+import com.github.narh.cipher.io.CipherInputStream;
+import com.github.narh.cipher.io.CipherInputStreamBuilder;
 import com.github.narh.cipher.io.CipherOutputStreamBuilder;
 import com.github.narh.cipher.io.CipherZipOutputStream;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author narita
  *
  */
-@Slf4j
 public class CipherZipOutputStreamTest {
 
   @Test
@@ -95,7 +101,30 @@ public class CipherZipOutputStreamTest {
     IOUtils.closeQuietly(in);
     IOUtils.closeQuietly(zos);
 
-    if(file.renameTo(new File("/Users/narita/Desktop/Hoge.enc")))
-      log.info("コピーしました");
+    in = new BufferedInputStream(new FileInputStream(file));
+    byte[] payload = new byte[16];
+    in.read(payload);
+
+    CipherInputStream cin = new CipherInputStreamBuilder()
+        .algorithm(CipherAlgorithm.AES256CBC)
+        .operation(CipherOperationMode.DECRYPT)
+        .secretkey(secretKey)
+        .iv(iv)
+        .inputStream(in)
+        .build();
+
+    ZipInputStream zin = new ZipInputStream(cin);
+    ZipEntry entry;
+    String data;
+    while((entry = zin.getNextEntry()) != null) {
+      assertThat("extract file name ", entry.getName(), anyOf(is("foo.txt"),is("bar.txt")));
+      out = new ByteArrayOutputStream();
+      IOUtils.copy(zin, out);
+      IOUtils.closeQuietly(out);
+      data = new String(((ByteArrayOutputStream) out).toByteArray());
+      assertThat("コンテンツ内容が期待値であること", data, anyOf(is("これはテスト１"),is("これはテスト２")));
+    }
+
+    file.delete();
   }
 }
