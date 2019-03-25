@@ -27,8 +27,6 @@
 
 package com.github.narh.cipher;
 
-import java.io.Serializable;
-
 import lombok.Data;
 
 /**
@@ -36,13 +34,11 @@ import lombok.Data;
  *
  */
 @Data
-public class CipherConfig implements Serializable {
-
-  private CipherAlgorithm algorithm;
-
-  private HashAlgorithm hashAlgorithm;
-
-  private String password;
+public class CipherParam {
 
   private byte[] salt;
+
+  private byte[] secretkey;
+
+  private byte[] iv;
 }

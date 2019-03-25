@@ -31,6 +31,7 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,7 +53,11 @@ import org.junit.Test;
 
 import com.github.narh.cipher.CipherAESUtils;
 import com.github.narh.cipher.CipherAlgorithm;
+import com.github.narh.cipher.CipherConfig;
 import com.github.narh.cipher.CipherOperationMode;
+import com.github.narh.cipher.CipherParam;
+import com.github.narh.cipher.CipherStreamFactory;
+import com.github.narh.cipher.HashAlgorithm;
 import com.github.narh.cipher.io.CipherInputStream;
 import com.github.narh.cipher.io.CipherInputStreamBuilder;
 import com.github.narh.cipher.io.CipherOutputStreamBuilder;
@@ -125,6 +130,54 @@ public class CipherZipOutputStreamTest {
       assertThat("コンテンツ内容が期待値であること", data, anyOf(is("これはテスト１"),is("これはテスト２")));
     }
 
+    file.delete();
+  }
+
+  @Test
+  public void testEncryptZipOutputStream() throws Exception {
+    CipherConfig config = new CipherConfig();
+    config.setAlgorithm(CipherAlgorithm.AES256CBC);
+    config.setHashAlgorithm(HashAlgorithm.SHA_256);
+
+    String password  = "password12345";
+    config.setPassword(password);
+
+    CipherParam param = new CipherParam();
+
+    File file = File.createTempFile("Foo", ".enc");
+    OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+
+    ZipOutputStream zos = CipherStreamFactory.getInstance().getEncryptZipOutputStream(config, param, out);
+
+    InputStream in;
+    zos.putNextEntry(new ZipEntry("foo.txt"));
+
+    in = new ByteArrayInputStream("これはテスト１".getBytes(Charset.forName("UTF-8")));
+    IOUtils.copy(in, zos);
+    IOUtils.closeQuietly(in);
+
+    zos.putNextEntry(new ZipEntry("bar.txt"));
+    in = new ByteArrayInputStream("これはテスト２".getBytes(Charset.forName("UTF-8")));
+    IOUtils.copy(in, zos);
+    IOUtils.closeQuietly(in);
+
+    IOUtils.closeQuietly(zos);
+    IOUtils.closeQuietly(out);
+
+    in = new BufferedInputStream(new FileInputStream(file));
+    ZipInputStream zin = CipherStreamFactory.getInstance().getDecryptZipInputStream(config, param, in);
+    ZipEntry entry;
+    String data;
+    while((entry = zin.getNextEntry()) != null) {
+      assertThat("extract file name ", entry.getName(), anyOf(is("foo.txt"),is("bar.txt")));
+      out = new ByteArrayOutputStream();
+      IOUtils.copy(zin, out);
+      IOUtils.closeQuietly(out);
+      data = new String(((ByteArrayOutputStream) out).toByteArray());
+      assertThat("コンテンツ内容が期待値であること", data, anyOf(is("これはテスト１"),is("これはテスト２")));
+    }
+    IOUtils.closeQuietly(zin);
+    IOUtils.closeQuietly(in);
     file.delete();
   }
 }

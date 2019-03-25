@@ -27,11 +27,17 @@
 
 package com.github.narh.cipher;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +51,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CipherAESUtils {
 
+  public static final String PAYLOAD_STR = "Salted__";
+
+  private CipherAESUtils() {}
 
   /**
    * OpenSSL によって暗号化されたデータファイルよりSALTを取得します。
@@ -119,5 +128,30 @@ public class CipherAESUtils {
     messageDigest.update(salt, 0, 8);
     digest = messageDigest.digest();
     return (1 < count) ? openSSLEvpBytesToKey(passphrase, salt, messageDigest, count--, digest) : digest;
+  }
+
+  public static byte[] readSaltFromInputStream(InputStream inputStream)
+      throws IOException {
+    byte[] payload = new byte[16];
+    inputStream.read(payload);
+    return Arrays.copyOfRange(payload, 8, 16);
+  }
+
+  public static byte[] generateSalt() {
+    SecureRandom random = new SecureRandom();
+    byte[] salt = new byte[8];
+    random.nextBytes(salt);
+    return salt;
+  }
+
+  public static void writePayload(OutputStream outputStream, final byte[] salt) throws IOException {
+    InputStream in = new ByteArrayInputStream(ArrayUtils.addAll(
+        PAYLOAD_STR.getBytes("ISO_8859_1"), salt));
+    IOUtils.copy(in, outputStream);
+    IOUtils.closeQuietly(in);
+  }
+
+  public static void writePayload(OutputStream outputStream) throws IOException {
+   writePayload(outputStream, generateSalt());
   }
 }

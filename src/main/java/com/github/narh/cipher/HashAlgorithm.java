@@ -27,22 +27,31 @@
 
 package com.github.narh.cipher;
 
-import java.io.Serializable;
-
-import lombok.Data;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author narita
  *
  */
-@Data
-public class CipherConfig implements Serializable {
+public enum HashAlgorithm {
+   SHA_128("SHA-128")
+  ,SHA_256("SHA-256")
+  ;
 
-  private CipherAlgorithm algorithm;
+  public final String algorithmName;
 
-  private HashAlgorithm hashAlgorithm;
+  private HashAlgorithm(final String algorithmName) {
+    this.algorithmName = algorithmName;
+  }
 
-  private String password;
-
-  private byte[] salt;
+  public MessageDigest getMessageDigest() {
+    try {
+      return MessageDigest.getInstance(algorithmName);
+    }
+    catch(NoSuchAlgorithmException e) {
+      // 発生しない
+      return null;
+    }
+  }
 }

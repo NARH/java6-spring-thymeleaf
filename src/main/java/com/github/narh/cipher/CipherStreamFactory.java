@@ -27,11 +27,16 @@
 
 package com.github.narh.cipher;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.crypto.NoSuchPaddingException;
@@ -49,6 +54,8 @@ public class CipherStreamFactory {
 
   private static CipherStreamFactory instance = new CipherStreamFactory();
 
+  public static final String BYTE_ENCODING="ISO_8859_1";
+
   private CipherStreamFactory() {
   }
 
@@ -56,28 +63,102 @@ public class CipherStreamFactory {
     return instance;
   }
 
-  public CipherInputStream getEncryptInputStream(InputStream inputStream)
-      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException {
-    return new CipherInputStreamBuilder().build();
+  public CipherInputStream getEncryptInputStream(CipherConfig config, CipherParam param, InputStream inputStream)
+      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IOException {
+    byte[] password   = config.getPassword().getBytes(BYTE_ENCODING);
+    byte[] salt       = CipherAESUtils.generateSalt();
+    MessageDigest md  = config.getHashAlgorithm().getMessageDigest();
+    byte[] secretKey  = CipherAESUtils.openSSLEvpBytesToKey(password, salt, md, 1, null);
+    byte[] iv         = Arrays.copyOf(
+        CipherAESUtils.openSSLEvpBytesToKey(password, salt, md, 1, secretKey), 16);
+
+    param.setSalt(salt);
+    param.setSecretkey(secretKey);
+    param.setIv(iv);
+
+    return new CipherInputStreamBuilder()
+        .operation(CipherOperationMode.ENCRYPT)
+        .algorithm(config.getAlgorithm())
+        .secretkey(secretKey)
+        .iv(iv)
+        .inputStream(inputStream)
+        .build();
   }
 
-  public CipherInputStream getDecryptInputStream(InputStream inputStream)
-      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException {
-    return new CipherInputStreamBuilder().build();
+  public CipherInputStream getDecryptInputStream(CipherConfig config, CipherParam param, InputStream inputStream)
+      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IOException {
+    byte[] password   = config.getPassword().getBytes(BYTE_ENCODING);
+    byte[] salt       = CipherAESUtils.readSaltFromInputStream(inputStream);
+    MessageDigest md  = config.getHashAlgorithm().getMessageDigest();
+    byte[] secretKey  = CipherAESUtils.openSSLEvpBytesToKey(password, salt, md, 1, null);
+    byte[] iv         = Arrays.copyOf(
+        CipherAESUtils.openSSLEvpBytesToKey(password, salt, md, 1, secretKey), 16);
+
+    param.setSalt(salt);
+    param.setSecretkey(secretKey);
+    param.setIv(iv);
+
+    return new CipherInputStreamBuilder()
+        .operation(CipherOperationMode.DECRYPT)
+        .algorithm(config.getAlgorithm())
+        .secretkey(secretKey)
+        .iv(iv)
+        .inputStream(inputStream)
+        .build();
   }
 
-  public CipherOutputStream getEncryptOutputStream(OutputStream outputStream)
-      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException {
-    return new CipherOutputStreamBuilder().build();
+  public CipherOutputStream getEncryptOutputStream(CipherConfig config, CipherParam param, OutputStream outputStream)
+      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IOException {
+    byte[] password   = config.getPassword().getBytes(BYTE_ENCODING);
+    byte[] salt       = CipherAESUtils.generateSalt();
+    MessageDigest md  = config.getHashAlgorithm().getMessageDigest();
+    byte[] secretKey  = CipherAESUtils.openSSLEvpBytesToKey(password, salt, md, 1, null);
+    byte[] iv         = Arrays.copyOf(
+        CipherAESUtils.openSSLEvpBytesToKey(password, salt, md, 1, secretKey), 16);
+
+    param.setSalt(salt);
+    param.setSecretkey(secretKey);
+    param.setIv(iv);
+
+    CipherAESUtils.writePayload(outputStream, salt);
+    return new CipherOutputStreamBuilder()
+        .operation(CipherOperationMode.ENCRYPT)
+        .algorithm(config.getAlgorithm())
+        .secretkey(secretKey)
+        .iv(iv)
+        .outputStream(outputStream)
+        .build();
   }
 
-  public CipherOutputStream getDecryptOutputStream(OutputStream outputStream)
-      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException {
-    return new CipherOutputStreamBuilder().build();
+  public CipherOutputStream getDecryptOutputStream(CipherConfig config, CipherParam param, OutputStream outputStream)
+      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+    byte[] password   = config.getPassword().getBytes(BYTE_ENCODING);
+    byte[] salt       = config.getSalt();
+    MessageDigest md  = config.getHashAlgorithm().getMessageDigest();
+    byte[] secretKey  = CipherAESUtils.openSSLEvpBytesToKey(password, salt, md, 1, null);
+    byte[] iv         = Arrays.copyOf(
+        CipherAESUtils.openSSLEvpBytesToKey(password, salt, md, 1, secretKey), 16);
+
+    param.setSalt(salt);
+    param.setSecretkey(secretKey);
+    param.setIv(iv);
+
+    return new CipherOutputStreamBuilder()
+        .operation(CipherOperationMode.DECRYPT)
+        .algorithm(config.getAlgorithm())
+        .secretkey(secretKey)
+        .iv(iv)
+        .outputStream(outputStream)
+        .build();
   }
 
-  public ZipOutputStream getZipOutputStream(OutputStream outputStream)
-      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException {
-    return new ZipOutputStream(new CipherOutputStreamBuilder().build());
+  public ZipOutputStream getEncryptZipOutputStream(CipherConfig config, CipherParam param, OutputStream outputStream)
+      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IOException {
+    return new ZipOutputStream(getEncryptOutputStream(config, param, outputStream));
+  }
+
+  public ZipInputStream getDecryptZipInputStream(CipherConfig config, CipherParam param, InputStream inputStream)
+      throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IOException {
+    return new ZipInputStream(getDecryptInputStream(config, param, inputStream));
   }
 }
